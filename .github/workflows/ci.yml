@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # Every reference solution must pass, every starter must fail, and the tree
+  # must be formatted and lint-clean. CPU only: nothing in the course needs an
+  # accelerator to be verified, though several exercises say what to try on one.
+  course:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --frozen
+
+      - name: Format and lint
+        run: |
+          ./npt format --check
+          ./npt lint
+
+      - name: Check the course
+        run: ./scripts/check-course.sh

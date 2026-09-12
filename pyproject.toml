@@ -1,0 +1,57 @@
+[project]
+name = "modern-numpy-pytorch-exercises"
+version = "1.0.0"
+description = "100 exercises to learn modern NumPy and PyTorch"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+license = { text = "CC-BY-NC-4.0" }
+dependencies = [
+  "numpy>=2.1",
+  "torch>=2.6",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3",
+  "pytest-timeout>=2.3",
+  "ruff>=0.8",
+]
+
+# ---------------------------------------------------------------------------
+# pytest
+#
+# Every exercise is one self-contained file, `exercise.py`, holding the code you
+# edit and the tests that check it. Two settings make that layout work:
+#
+#   python_files   pytest normally only looks in test_*.py; we tell it the
+#                  exercise files ARE the test files.
+#   importlib      exercises/ and solutions/ both contain a file called
+#                  exercise.py in every directory. Under the default import
+#                  mode pytest would refuse the duplicate module names.
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+python_files = ["exercise.py"]
+python_functions = ["test_*"]
+testpaths = ["exercises"]
+addopts = "--import-mode=importlib -p no:cacheprovider"
+timeout = 120
+filterwarnings = ["error::DeprecationWarning:numpy", "error::DeprecationWarning:torch"]
+
+# ---------------------------------------------------------------------------
+# ruff -- formatter and linter in one tool. Formatting is a solved problem:
+# pick a style, put it in a file, never argue about it again.
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 90
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "NPY", "RUF"]
+ignore = [
+  "E741",   # ambiguous variable names such as `l` -- linear algebra uses them
+  "RUF012", # mutable class attributes -- torch modules assign in __init__
+]
+
+[tool.ruff.lint.per-file-ignores]
+# A starter file may deliberately contain the bug an exercise is about.
+"exercises/**" = ["F841", "B007", "NPY002"]
